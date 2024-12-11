@@ -8,6 +8,7 @@ require_relative 'pokemon_card_simulator/card'
 require_relative 'pokemon_card_simulator/cards/pokemon_card'
 require_relative 'pokemon_card_simulator/cards/goods_card'
 require_relative 'pokemon_card_simulator/cards/support_card'
+require_relative 'pokemon_card_simulator/cards/energy_card'
 
 # その他のクラスの読み込み
 require_relative 'pokemon_card_simulator/player'

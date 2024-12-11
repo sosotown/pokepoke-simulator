@@ -3,7 +3,7 @@
 module PokemonCardSimulator
   module Cards
     class PokemonCard < Card
-      attr_reader :hp, :attack, :stage, :type, :evolution_from
+      attr_reader :hp, :attacks, :stage, :type, :evolution_from
       attr_accessor :current_hp, :paralyzed
 
       def initialize(name:, hp:, type:, stage: 'basic', evolution_from: nil, attacks: [])

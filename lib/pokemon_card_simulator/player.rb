@@ -17,6 +17,7 @@ module PokemonCardSimulator
       @discard_pile = []
       @strategy = strategy
       @pokemon_played_this_turn = []
+      @initial_turn = true
     end
 
     def draw_card
@@ -44,11 +45,16 @@ module PokemonCardSimulator
       true
     end
 
-    def play_turn(game_state = {})
+    def play_turn(opponent, game_state = {})
       @pokemon_played_this_turn = []
 
-      draw_card
-      play_cards(game_state)
+      if @initial_turn
+        @initial_turn = false
+      else
+        draw_card
+      end
+
+      play_cards(opponent, game_state)
       true
     end
 
@@ -65,7 +71,7 @@ module PokemonCardSimulator
 
     private
 
-    def play_cards(game_state)
+    def play_cards(opponent, game_state)
       played_support = false
 
       # グッズカードを使う
@@ -81,8 +87,8 @@ module PokemonCardSimulator
       play_energy_cards(game_state)
 
       # 攻撃する
-      @battle_zone.attacks.times do |index|
-        return black if @battle_zone.use_attack(index, self, game_state)
+      @battle_zone.attacks.count.times do |index|
+        break if @battle_zone.use_attack(index, self, opponent)
       end
     end
 
@@ -108,6 +114,7 @@ module PokemonCardSimulator
           @pokemon_played_this_turn << pokemon
         elsif pokemon.evolution? && can_evolve?(pokemon)
           evolve_pokemon(pokemon)
+          @pokemon_played_this_turn << pokemon
         end
       end
     end

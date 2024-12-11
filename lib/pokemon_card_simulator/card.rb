@@ -22,7 +22,7 @@ module PokemonCardSimulator
 
     define_effect :search_pokemon do |player, game_state, params|
       pokemon = player.deck.find { |card|
-        card.is_a?(PokemonCard) &&
+        card.is_a?(Cards::PokemonCard) &&
         (
           (params[:name].nil? || card.name == params[:name])
           (params[:stage].nil? || card.stage == params[:stage])

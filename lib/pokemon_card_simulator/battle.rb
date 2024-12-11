@@ -44,12 +44,13 @@ module PokemonCardSimulator
     end
 
     def play_turn(player, opponent)
-      result = player.play_turn(@game_state)
+      result = player.play_turn(opponent, @game_state)
       return false unless result
+      return false unless player.battle_zone
 
       execute_battle(player, opponent) if player.battle_zone
 
-      return false unless opponent.battle_zone
+      return false unless @turn == 0 || opponent.battle_zone
 
       true
     end

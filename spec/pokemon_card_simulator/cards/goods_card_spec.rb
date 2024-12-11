@@ -66,6 +66,7 @@ RSpec.describe PokemonCardSimulator::Cards::GoodsCard do
   let(:player) do
     PokemonCardSimulator::Player.new(
       deck: [potion, monster_ball] * 8 + [pikachu, pikachu, pikachu, pikachu],
+      energy_elements: [PokemonCardSimulator::Cards::EnergyCard.new(energy_type: 'electric')]
     )
   end
 

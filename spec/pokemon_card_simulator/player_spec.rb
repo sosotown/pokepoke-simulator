@@ -12,7 +12,7 @@ RSpec.describe PokemonCardSimulator::Player do
   shibibiru_options = { name: "シビビール", hp: 80, type: 'electric', stage: 'evolution', evolution_from: "シビシラス", attacks: [{ name: 'ヘッドボルト', damage: 40, energy_requirement: { 'electric' => 1 } }] }
   shibirudon_options = { name: "シビルドン", hp: 140, type: 'electric', stage: 'evolution', evolution_from: "シビビール", attacks: [{ name: 'かみなりのキバ', damage: 80, energy_requirement: { 'electric' => 2, 'normal' => 1 }, effects: [ { type: 'paralyze', target: 'opponent_active', flip_coin: true } ] }] }
   monster_ball_options = { name: "モンスターボール", effects: [{ type: 'search', target: 'basic_pokemon_in_deck', value: 1 }] }
-  okd_options = { name: "オーキド博士", effects: [{ type: 'draw', value: 3 }] }
+  okd_options = { name: "オーキド博士", effects: [{ type: 'draw', value: 2 }] }
 
   let(:deck) {
     [
@@ -45,7 +45,7 @@ RSpec.describe PokemonCardSimulator::Player do
     ].flatten
   }
 
-  let(:player) { described_class.new(deck: deck, energy_elements: ['electric']) }
+  let(:player) { described_class.new(deck: deck, energy_elements: [PokemonCardSimulator::Cards::EnergyCard.new(energy_type: 'electric')]) }
 
   describe '#draw_card' do
     it 'デッキからカードが手札に移動する' do
@@ -94,11 +94,33 @@ RSpec.describe PokemonCardSimulator::Player do
 
   describe '#play_turn' do
     let(:game_state) { {} }
+    let(:opponent) { described_class.new(deck: deck, energy_elements: [PokemonCardSimulator::Cards::EnergyCard.new(energy_type: 'electric')]) }
+
+    let(:deck) {
+      [
+        [
+          pikachu_ex_options,
+          biriri_options,
+          shimama_options,
+          zeburaika_options,
+          elekiteru_options,
+          elezerd_options,
+          shibishirasu_options,
+          shibishirasu_options,
+          shibibiru_options,
+          shibibiru_options,
+          shibirudon_options
+        ].map do |options|
+          PokemonCardSimulator::Cards::PokemonCard.new(**options)
+        end
+      ].flatten
+    }
 
     before do
+      allow(player.deck).to receive(:shuffle!)
       player.battle_zone = PokemonCardSimulator::Cards::PokemonCard.new(**biriri_options)
       player.bench = [PokemonCardSimulator::Cards::PokemonCard.new(**shimama_options)]
-      player.hand = [
+      player.hand.concat([
         PokemonCardSimulator::Cards::PokemonCard.new(**marumain_options),
         PokemonCardSimulator::Cards::PokemonCard.new(**elekiteru_options),
         PokemonCardSimulator::Cards::PokemonCard.new(**pikachu_ex_options),
@@ -106,33 +128,22 @@ RSpec.describe PokemonCardSimulator::Player do
         PokemonCardSimulator::Cards::SupportCard.new(**okd_options),
         PokemonCardSimulator::Cards::GoodsCard.new(**monster_ball_options),
         PokemonCardSimulator::Cards::GoodsCard.new(**monster_ball_options)
-      ]
-      player.deck = [
-        [
-          [
-            pikachu_ex_options,
-            biriri_options,
-            shimama_options,
-            zeburaika_options,
-            elekiteru_options,
-            elezerd_options,
-            shibishirasu_options,
-            shibishirasu_options,
-            shibibiru_options,
-            shibibiru_options,
-            shibirudon_options
-          ].map do |options|
-            PokemonCardSimulator::Cards::PokemonCard.new(**options)
-          end
-        ].flatten
-      ]
+      ])
+
+      opponent.battle_zone = PokemonCardSimulator::Cards::PokemonCard.new(**shibishirasu_options)
     end
 
     it 'ターンプレイが成功する' do
-      expect { player.play_turn(game_state) }.to change { player.hand.size }.change(-1) # マルマインを出す (-1)、エレキテルを出す (-1)、ピカチュウEXを出す(-1)、オーキド博士を使う (+2)、モンスターボールを使う X 2 (±0)
+      # モンスターボールを使う X 2 (±0)
+      #   ピカチュウEX, ビリリダマ 手札IN 手札:（マルマイン, エレキテル, ピカチュウEX, オーキド, オーキド, ピカチュウEX, ビリリダマ）
+      # オーキド博士を使う (+1)
+      #   シママ, ゼブライカ 手札IN 手札:（マルマイン, エレキテル, ピカチュウEX, オーキド. ピカチュウEX, ビリリダマ, シママ, ゼブライカ）
+      # マルマインを出す (-1)、エレキテルを出す (-1)、ピカチュウEXを出す(-1)、ゼブライカを出す(-1)
+      #   手札:（オーキド. ピカチュウEX, ビリリダマ, シママ）
+      expect { player.play_turn(opponent, game_state) }.to change { player.hand.size }.by(-3)
 
       # 出したポケモンの数が増える
-      expect(player.pokemon_played_this_turn.size).to eq 3
+      expect(player.pokemon_played_this_turn.size).to eq 4
 
       # グッツは全部使われる
       expect(player.hand.select { |card| card.is_a?(PokemonCardSimulator::Cards::GoodsCard) }.size).to eq 0

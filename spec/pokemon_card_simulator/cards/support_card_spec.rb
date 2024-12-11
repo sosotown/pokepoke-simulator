@@ -13,7 +13,7 @@ RSpec.describe PokemonCardSimulator::Cards::SupportCard do
   end
 
   let(:player) do
-    PokemonCardSimulator::Player.new(deck: [okd] * 20)
+    PokemonCardSimulator::Player.new(deck: [okd] * 20, energy_elements: [PokemonCardSimulator::Cards::EnergyCard.new(energy_type: 'electric')])
   end
 
   describe '#playable?' do
