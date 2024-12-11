@@ -4,7 +4,7 @@ module PokemonCardSimulator
       attr_reader :energy_type
 
       def initialize(energy_type:)
-        super(name: energy_type, type: 'energy')
+        super(name: energy_type, kind: 'energy')
         @energy_type = energy_type
       end
 
@@ -13,7 +13,7 @@ module PokemonCardSimulator
         return false if game_state[:energy_played_this_turn]  # すでにエネルギーを付けている
 
         # バトル場かベンチにポケモンがいる場合のみ付けられる
-        player.battle_zone || !player.bench.empty?
+        player.battle_zone.present? || !player.bench.empty?
       end
 
       def play(player, game_state = {}, target: nil)

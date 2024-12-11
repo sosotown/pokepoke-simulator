@@ -5,8 +5,10 @@ module PokemonCardSimulator
     def initialize(player1:, player2:)
       @player1 = player1
       @player2 = player2
+      @player1.deck.shuffle!
+      @player2.deck.shuffle!
       @turn = 0
-      @game_state = { support_played_this_turn: false }
+      @game_state = { support_played_this_turn: false, first_turn: true }
     end
 
     def simulate
@@ -32,6 +34,7 @@ module PokemonCardSimulator
 
         # プレイヤー2のターン
         @game_state[:support_played_this_turn] = false
+        @game_state[:first_turn] = false
         return :player1_wins unless play_turn(@player2, @player1)
 
         # 勝敗判定
@@ -50,7 +53,8 @@ module PokemonCardSimulator
 
       execute_battle(player, opponent) if player.battle_zone
 
-      return false unless @turn == 0 || opponent.battle_zone
+      return false unless opponent.life.positive?
+      return false unless @game_state[:first_turn] || opponent.battle_zone
 
       true
     end
@@ -58,10 +62,9 @@ module PokemonCardSimulator
     def execute_battle(attacker, defender)
       return unless attacker.battle_zone && defender.battle_zone
 
-      attacker.battle_zone.use_attack(0, attacker, defender)
-
       if !defender.battle_zone.alive?
         defender.battle_zone_knocked_out
+        defender.life -= 1
       end
     end
 

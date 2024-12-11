@@ -93,7 +93,7 @@ RSpec.describe PokemonCardSimulator::Player do
   end
 
   describe '#play_turn' do
-    let(:game_state) { {} }
+    let(:game_state) { { first_turn: true } }
     let(:opponent) { described_class.new(deck: deck, energy_elements: [PokemonCardSimulator::Cards::EnergyCard.new(energy_type: 'electric')]) }
 
     let(:deck) {

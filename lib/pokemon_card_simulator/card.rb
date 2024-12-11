@@ -3,7 +3,7 @@
 module PokemonCardSimulator
   class Card
     # 基本属性の読み取り専用アクセサ
-    attr_reader :name, :type
+    attr_reader :name, :kind
 
     class << self
       def define_effect(name, &block)
@@ -60,11 +60,11 @@ module PokemonCardSimulator
 
     # カードの初期化
     # @param name [String] カードの名前
-    # @param type [String] カードの種類 ('pokemon', 'goods', 'support')
+    # @param kind [String] カードの種類 ('pokemon', 'goods', 'support')
     # @param effects [Array<Hash>] カードの効果（オプション）
-    def initialize(name:, type:, effects: [])
+    def initialize(name:, kind:, effects: [])
       @name = name
-      @type = type
+      @kind = kind
       @effects = effects
     end
 

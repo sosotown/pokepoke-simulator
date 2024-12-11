@@ -20,23 +20,25 @@ module PokemonCardSimulator
   class Error < StandardError; end
 
   # シミュレーション実行のヘルパーメソッド
-  def self.run(deck1:, deck2:, num_games: 1000)
-    simulator = Simulator.new(deck1: deck1, deck2: deck2, num_games: num_games)
+  def self.run(player1_options:, player2_options:, num_games: 1000)
+    simulator = Simulator.new(player1_options: player1_options, player2_options: player2_options, num_games: num_games)
     simulator.run
   end
 
   # 簡易的なデッキビルダー
   def self.build_deck(cards)
     cards.map do |card_data|
-      case card_data[:type]
+      kind = card_data[:kind]
+      case kind
       when 'pokemon'
-        Cards::PokemonCard.new(**card_data)
+        Cards::PokemonCard.new(**card_data.except(:kind))
       when 'goods'
-        Cards::GoodsCard.new(**card_data)
+        Cards::GoodsCard.new(**card_data.except(:kind))
       when 'support'
-        Cards::SupportCard.new(**card_data)
+        Cards::SupportCard.new(**card_data.except(:kind))
       else
-        raise Error, "Unknown card type: #{card_data[:type]}"
+        binding.pry
+        raise Error, "Unknown card type: #{kind}"
       end
     end
   end

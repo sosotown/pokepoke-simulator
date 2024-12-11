@@ -4,7 +4,7 @@ module PokemonCardSimulator
   module Cards
     class SupportCard < Card
       def initialize(name:, effects:, priority: 1)
-        super(name: name, type: 'support', effects: effects)
+        super(name: name, kind: 'support', effects: effects)
         @priority = priority  # サポートカードの優先度
       end
 

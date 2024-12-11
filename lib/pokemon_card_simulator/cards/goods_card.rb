@@ -4,7 +4,7 @@ module PokemonCardSimulator
   module Cards
     class GoodsCard < Card
       def initialize(name:, effects:)
-        super(name: name, type: 'goods', effects: effects)
+        super(name: name, kind: 'goods', effects: effects)
       end
 
       def playable?(_player, _game_state = {})

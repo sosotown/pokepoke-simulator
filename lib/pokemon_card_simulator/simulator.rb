@@ -2,9 +2,9 @@
 
 module PokemonCardSimulator
   class Simulator
-    def initialize(deck1:, deck2:, num_games: 1000)
-      @deck1 = deck1
-      @deck2 = deck2
+    def initialize(player1_options:, player2_options:, num_games: 1000)
+      @player1_options = player1_options
+      @player2_options = player2_options
       @num_games = num_games
     end
 
@@ -16,13 +16,11 @@ module PokemonCardSimulator
       }
 
       Parallel.each(1..@num_games, in_threads: 4) do |_|
-        # デッキのディープコピーを作成
-        deck1_copy = Marshal.load(Marshal.dump(@deck1)).shuffle
-        deck2_copy = Marshal.load(Marshal.dump(@deck2)).shuffle
+        player1_deck = PokemonCardSimulator.build_deck(@player1_options[:deck])
+        player2_deck = PokemonCardSimulator.build_deck(@player2_options[:deck])
+        player1 = Player.new(deck: player1_deck, energy_elements: @player1_options[:energy_elements])
+        player2 = Player.new(deck: player2_deck, energy_elements: @player2_options[:energy_elements])
 
-        # プレイヤーとバトルの初期化
-        player1 = Player.new(deck: deck1_copy)
-        player2 = Player.new(deck: deck2_copy)
         battle = Battle.new(player1: player1, player2: player2)
 
         # 結果を集計

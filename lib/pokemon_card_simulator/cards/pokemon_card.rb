@@ -7,7 +7,7 @@ module PokemonCardSimulator
       attr_accessor :current_hp, :paralyzed
 
       def initialize(name:, hp:, type:, stage: 'basic', evolution_from: nil, attacks: [])
-        super(name: name, type: 'pokemon')
+        super(name: name, kind: 'pokemon')
         @hp = hp
         @current_hp = hp
         @type = type
@@ -46,7 +46,6 @@ module PokemonCardSimulator
 
         attack = @attacks[attack_index]
         damage = attack[:damage]
-
         # 攻撃効果の適用
         defender.battle_zone.take_damage(damage)
 

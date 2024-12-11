@@ -2,7 +2,7 @@
 
 module PokemonCardSimulator
   class Player
-    attr_accessor :battle_zone, :bench, :pokemon_played_this_turn
+    attr_accessor :battle_zone, :bench, :pokemon_played_this_turn, :life
     attr_reader :deck, :hand, :discard_pile, :energy_elements
 
     INITIAL_DRAW_CARD_COUNT = 5
@@ -17,7 +17,7 @@ module PokemonCardSimulator
       @discard_pile = []
       @strategy = strategy
       @pokemon_played_this_turn = []
-      @initial_turn = true
+      @life = 3
     end
 
     def draw_card
@@ -48,14 +48,9 @@ module PokemonCardSimulator
     def play_turn(opponent, game_state = {})
       @pokemon_played_this_turn = []
 
-      if @initial_turn
-        @initial_turn = false
-      else
-        draw_card
-      end
+      draw_card unless game_state[:first_turn]
 
-      play_cards(opponent, game_state)
-      true
+      return play_cards(opponent, game_state)
     end
 
     def battle_zone_knocked_out
@@ -66,7 +61,7 @@ module PokemonCardSimulator
     end
 
     def pick_from_bench
-      @battle_zone = @bench.random
+      @battle_zone = @bench.sample
     end
 
     private
@@ -86,10 +81,16 @@ module PokemonCardSimulator
       # エネルギーを付ける
       play_energy_cards(game_state)
 
+      # バトル場に出せない場合は負け
+      return false if @battle_zone.nil?
       # 攻撃する
       @battle_zone.attacks.count.times do |index|
-        break if @battle_zone.use_attack(index, self, opponent)
+        attack_index = @battle_zone.attacks.count - 1 - index
+
+        break if @battle_zone.use_attack(attack_index, self, opponent)
       end
+
+      true
     end
 
     def play_energy_cards(game_state)
