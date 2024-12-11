@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - bundle_cache:/usr/local/bundle
+    environment:
+      - RUBY_YJIT_ENABLE=1
+    tty: true
+    stdin_open: true
+    command: /bin/bash
+    init: true
+
+volumes:
+  bundle_cache:
